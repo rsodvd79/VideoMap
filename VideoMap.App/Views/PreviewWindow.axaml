@@ -1,0 +1,105 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VideoMap.App.ViewModels"
+        xmlns:vlc="using:LibVLCSharp.Avalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="960" d:DesignHeight="540"
+        x:Class="VideoMap.App.Views.PreviewWindow"
+        x:DataType="vm:PreviewWindowViewModel"
+        Title="VideoMap Preview"
+        Background="#000000">
+
+    <Design.DataContext>
+        <vm:PreviewWindowViewModel/>
+    </Design.DataContext>
+
+    <Border Background="#000000">
+        <Grid>
+            <Viewbox Stretch="Uniform">
+                <Grid x:Name="PreviewSurface" Width="{Binding Project.CanvasWidth}" Height="{Binding Project.CanvasHeight}">
+                    <ItemsControl ItemsSource="{Binding Polygons}"
+                                  IsHitTestVisible="False"
+                                  Width="{Binding Width, ElementName=PreviewSurface}"
+                                  Height="{Binding Height, ElementName=PreviewSurface}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Canvas Width="{Binding Width, ElementName=PreviewSurface}"
+                                        Height="{Binding Height, ElementName=PreviewSurface}">
+                                    <Image Source="{Binding WarpedBitmap}"
+                                           Width="{Binding Bounds.Width}"
+                                           Height="{Binding Bounds.Height}"
+                                           Canvas.Left="{Binding Bounds.X}"
+                                           Canvas.Top="{Binding Bounds.Y}"
+                                           IsVisible="{Binding IsWarpedVisible}" />
+                                    <Polygon Points="{Binding RenderPoints}"
+                                             Fill="{Binding ImageFill}"
+                                             StrokeThickness="0"
+                                             IsVisible="{Binding HasImageClip}" />
+                                </Canvas>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{Binding VideoLayers}"
+                                  IsHitTestVisible="False"
+                                  Width="{Binding Width, ElementName=PreviewSurface}"
+                                  Height="{Binding Height, ElementName=PreviewSurface}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <vlc:VideoView MediaPlayer="{Binding MediaPlayer}"
+                                               Clip="{Binding ClipGeometry}"
+                                               Canvas.Left="0"
+                                               Canvas.Top="0"
+                                               Width="{Binding Width, ElementName=PreviewSurface}"
+                                               Height="{Binding Height, ElementName=PreviewSurface}"
+                                               IsVisible="{Binding HasVideo}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Canvas Background="#000000">
+                        <ItemsControl ItemsSource="{Binding Polygons}"
+                                      IsHitTestVisible="False"
+                                      Width="{Binding Width, ElementName=PreviewSurface}"
+                                      Height="{Binding Height, ElementName=PreviewSurface}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                <Polygon Points="{Binding RenderPoints}"
+                                         Stroke="#F0F0F0"
+                                         StrokeThickness="2"
+                                         Fill="#22FFFFFF"
+                                         IsVisible="{Binding IsSceneVisible}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Canvas>
+                    <TextBlock Text="Preview in attesa di poligoni"
+                               Foreground="#9A9A9A"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding HasNoPolygons}" />
+                </Grid>
+            </Viewbox>
+            <TextBlock Text="{Binding VideoStatus}"
+                       Foreground="#9A9A9A"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Margin="12"
+                       TextWrapping="Wrap" />
+        </Grid>
+    </Border>
+</Window>
