@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:VideoMap.App.ViewModels"
         xmlns:models="using:VideoMap.App.Models"
-        xmlns:vlc="using:LibVLCSharp.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -212,13 +211,22 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <vlc:VideoView MediaPlayer="{Binding MediaPlayer}"
-                                               Clip="{Binding ClipGeometry}"
-                                               Canvas.Left="0"
-                                               Canvas.Top="0"
-                                               Width="{Binding Bounds.Width, ElementName=DesignSurface}"
-                                               Height="{Binding Bounds.Height, ElementName=DesignSurface}"
-                                               IsVisible="{Binding IsVisible}" />
+                                <Canvas>
+                                    <Image Source="{Binding WarpedVideoBitmap}"
+                                           Width="{Binding Bounds.Width}"
+                                           Height="{Binding Bounds.Height}"
+                                           Canvas.Left="{Binding Bounds.X}"
+                                           Canvas.Top="{Binding Bounds.Y}"
+                                           IsVisible="{Binding IsWarpedVisible}" />
+                                    <Image Source="{Binding VideoBitmap}"
+                                           Clip="{Binding ClipGeometry}"
+                                           Canvas.Left="0"
+                                           Canvas.Top="0"
+                                           Width="{Binding Bounds.Width, ElementName=DesignSurface}"
+                                           Height="{Binding Bounds.Height, ElementName=DesignSurface}"
+                                           Stretch="Fill"
+                                           IsVisible="{Binding IsClipVisible}" />
+                                </Canvas>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

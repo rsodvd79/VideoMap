@@ -1,0 +1,12 @@
+.DS_Store
+VideoMap.App/bin/Debug/
+VideoMap.App/bin/Release/
+VideoMap.App/obj/Debug/
+VideoMap.App/obj/Release/
+VideoMap.App/packages/
+VideoMap.App/.vs/
+*.user
+*.suo
+*.log
+*.tmp
+*.bak

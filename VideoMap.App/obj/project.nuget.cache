@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NNrTzWD9GiOi/+h8Oiw9TxDpqflDqtv4isSJDV4EEFGB+auMRYMzhtRIa3cuFnTUEcIjvWEk3jRduqVyBJ4xCw==",
+  "dgSpecHash": "ci8kaLASKgUKEFjUPCiyeGIj8bhXUqWDv8ofj8hKcktA08OL7c0QfVJysbVEnSAHHogJwsaAY2kNnPAwiF149A==",
   "success": true,
   "projectFilePath": "/Users/daviderosa/VideoMap/VideoMap.App/VideoMap.App.csproj",
   "expectedPackageFiles": [
@@ -50,7 +50,8 @@
     "/Users/daviderosa/.nuget/packages/system.text.encoding/4.3.0/system.text.encoding.4.3.0.nupkg.sha512",
     "/Users/daviderosa/.nuget/packages/system.threading/4.3.0/system.threading.4.3.0.nupkg.sha512",
     "/Users/daviderosa/.nuget/packages/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg.sha512",
-    "/Users/daviderosa/.nuget/packages/tmds.dbus.protocol/0.21.2/tmds.dbus.protocol.0.21.2.nupkg.sha512"
+    "/Users/daviderosa/.nuget/packages/tmds.dbus.protocol/0.21.2/tmds.dbus.protocol.0.21.2.nupkg.sha512",
+    "/Users/daviderosa/.nuget/packages/videolan.libvlc.mac/3.1.2/videolan.libvlc.mac.3.1.2.nupkg.sha512"
   ],
   "logs": []
 }

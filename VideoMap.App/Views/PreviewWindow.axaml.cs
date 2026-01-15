@@ -10,6 +10,7 @@ namespace VideoMap.App.Views;
 public partial class PreviewWindow : Window
 {
     private LibVLC? _libVlc;
+    private string? _libVlcStatus;
 
     public PreviewWindow()
         : this(ProjectModel.CreateDefault())
@@ -20,23 +21,24 @@ public partial class PreviewWindow : Window
     {
         InitializeComponent();
         InitializeVideoEngine();
-        DataContext = new PreviewWindowViewModel(project, _libVlc);
+        DataContext = new PreviewWindowViewModel(project, _libVlc, _libVlcStatus);
         Closed += (_, _) => Cleanup();
     }
 
     public void ResetProject(ProjectModel project)
     {
         (DataContext as IDisposable)?.Dispose();
-        DataContext = new PreviewWindowViewModel(project, _libVlc);
+        DataContext = new PreviewWindowViewModel(project, _libVlc, _libVlcStatus);
     }
 
     private void InitializeVideoEngine()
     {
-        LibVlcEngine.TryGet(out _libVlc, out _);
+        LibVlcEngine.TryGet(out _libVlc, out _libVlcStatus);
     }
 
     private void Cleanup()
     {
         (DataContext as IDisposable)?.Dispose();
     }
+
 }

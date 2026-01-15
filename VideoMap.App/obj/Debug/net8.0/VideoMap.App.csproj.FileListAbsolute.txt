@@ -75,3 +75,5 @@
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/ref/VideoMap.App.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/LibVLCSharp.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/LibVLCSharp.Avalonia.dll
+/Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.sourcelink.json
+/Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/libvlc.dylib

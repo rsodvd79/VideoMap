@@ -13,12 +13,19 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly ProjectModel _project;
     private readonly LibVLC? _libVlc;
+    private readonly string? _libVlcStatus;
     private string _videoStatus = "Nessun video assegnato";
 
-    public PreviewWindowViewModel(ProjectModel project, LibVLC? libVlc)
+    public PreviewWindowViewModel()
+        : this(ProjectModel.CreateDefault(), null, null)
+    {
+    }
+
+    public PreviewWindowViewModel(ProjectModel project, LibVLC? libVlc, string? libVlcStatus)
     {
         _project = project;
         _libVlc = libVlc;
+        _libVlcStatus = libVlcStatus;
         _project.Polygons.CollectionChanged += OnPolygonsChanged;
 
         foreach (var polygon in _project.Polygons)
@@ -123,7 +130,9 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
     {
         if (_libVlc == null)
         {
-            VideoStatus = "LibVLC non disponibile: installa VLC per la preview video";
+            VideoStatus = string.IsNullOrWhiteSpace(_libVlcStatus)
+                ? "LibVLC non disponibile: installa VLC per la preview video"
+                : _libVlcStatus;
             OnPropertyChanged(nameof(HasVideos));
             OnPropertyChanged(nameof(HasNoVideos));
             return;
