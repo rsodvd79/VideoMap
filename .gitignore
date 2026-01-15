@@ -1,10 +1,9 @@
 .DS_Store
-VideoMap.App/bin/Debug/
-VideoMap.App/bin/Release/
-VideoMap.App/obj/Debug/
-VideoMap.App/obj/Release/
+**/bin/
+**/obj/
 VideoMap.App/packages/
-VideoMap.App/.vs/
+.vs/
+.idea/
 *.user
 *.suo
 *.log

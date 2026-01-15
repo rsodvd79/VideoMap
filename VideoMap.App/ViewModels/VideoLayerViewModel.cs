@@ -30,10 +30,12 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
     private int _videoHeight;
     private int _videoPitch;
     private int _framePending;
-    private long _frameCounter;
-    private long _lastFrameLogTicks;
-    private int _formatLogCount;
-    private int _displayLogCount;
+    private WriteableBitmap? _videoBitmapA;
+    private WriteableBitmap? _videoBitmapB;
+    private bool _useVideoBitmapA = true;
+    private WriteableBitmap? _warpedBitmapA;
+    private WriteableBitmap? _warpedBitmapB;
+    private bool _useWarpedBitmapA = true;
     private readonly MediaPlayer.LibVLCVideoLockCb _lockCb;
     private readonly MediaPlayer.LibVLCVideoUnlockCb _unlockCb;
     private readonly MediaPlayer.LibVLCVideoDisplayCb _displayCb;
@@ -69,13 +71,11 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         get => _videoBitmap;
         private set
         {
-            var old = _videoBitmap;
             if (SetProperty(ref _videoBitmap, value))
             {
                 OnPropertyChanged(nameof(HasVideoBitmap));
                 OnPropertyChanged(nameof(IsFrameVisible));
                 OnPropertyChanged(nameof(IsClipVisible));
-                old?.Dispose();
             }
         }
     }
@@ -87,13 +87,11 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         get => _warpedVideoBitmap;
         private set
         {
-            var old = _warpedVideoBitmap;
             if (SetProperty(ref _warpedVideoBitmap, value))
             {
                 OnPropertyChanged(nameof(HasWarpedVideo));
                 OnPropertyChanged(nameof(IsWarpedVisible));
                 OnPropertyChanged(nameof(IsClipVisible));
-                old?.Dispose();
             }
         }
     }
@@ -121,6 +119,9 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         _mediaPlayer?.Dispose();
         _mediaPlayer = null;
         ReleaseVideoBuffer();
+        VideoBitmap = null;
+        WarpedVideoBitmap = null;
+        DisposeBitmaps();
     }
 
     public void Play()
@@ -336,7 +337,6 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         lines = (uint)h;
 
         AllocateVideoBuffer(w, h, _videoPitch);
-        LogVideo($"format {w}x{h} pitch={_videoPitch} path={_currentPath ?? "(null)"}", ref _formatLogCount, 1);
         return 1;
     }
 
@@ -367,7 +367,6 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        LogVideoFrame();
         if (Interlocked.Exchange(ref _framePending, 1) == 1)
         {
             return;
@@ -398,7 +397,6 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         _videoWidth = 0;
         _videoHeight = 0;
         _videoPitch = 0;
-        VideoBitmap = null;
     }
 
     private void UpdateVideoFrame()
@@ -407,16 +405,10 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         {
             if (_videoBuffer == IntPtr.Zero || _videoWidth <= 0 || _videoHeight <= 0)
             {
-                LogVideo("frame skipped (bitmap/buffer missing)", ref _displayLogCount, 1);
                 return;
             }
 
-            var frameBitmap = new WriteableBitmap(
-                new PixelSize(_videoWidth, _videoHeight),
-                new Vector(96, 96),
-                PixelFormat.Bgra8888,
-                AlphaFormat.Premul);
-
+            var frameBitmap = GetVideoFrameBitmap(_videoWidth, _videoHeight);
             using var fb = frameBitmap.Lock();
             var destStride = fb.RowBytes;
             var srcStride = _videoPitch;
@@ -467,11 +459,7 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        var bitmap = new WriteableBitmap(
-            new PixelSize(width, height),
-            new Vector(96, 96),
-            PixelFormat.Bgra8888,
-            AlphaFormat.Premul);
+        var bitmap = GetWarpedBitmap(width, height);
 
         if (_videoBuffer != IntPtr.Zero && _videoWidth > 0 && _videoHeight > 0)
         {
@@ -548,39 +536,66 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         canvas.DrawVertices(vertices, SKBlendMode.SrcOver, paint);
     }
 
-    private void LogVideoFrame()
+    private WriteableBitmap GetVideoFrameBitmap(int width, int height)
     {
-        var frames = Interlocked.Increment(ref _frameCounter);
-        if (frames == 1)
+        var useA = _useVideoBitmapA;
+        var bitmap = useA ? _videoBitmapA : _videoBitmapB;
+        if (bitmap == null || bitmap.PixelSize.Width != width || bitmap.PixelSize.Height != height)
         {
-            LogVideo($"first display callback { _videoWidth }x{ _videoHeight }", ref _displayLogCount, 1);
-            return;
-        }
-
-        var now = Environment.TickCount64;
-        var last = Interlocked.Read(ref _lastFrameLogTicks);
-        if (now - last < 2000)
-        {
-            return;
-        }
-
-        if (Interlocked.CompareExchange(ref _lastFrameLogTicks, now, last) == last)
-        {
-            LogVideo($"frames={frames}", ref _displayLogCount, 0);
-        }
-    }
-
-    private static void LogVideo(string message, ref int counter, int limit)
-    {
-        if (limit > 0)
-        {
-            var next = Interlocked.Increment(ref counter);
-            if (next > limit)
+            bitmap = new WriteableBitmap(
+                new PixelSize(width, height),
+                new Vector(96, 96),
+                PixelFormat.Bgra8888,
+                AlphaFormat.Premul);
+            if (useA)
             {
-                return;
+                _videoBitmapA = bitmap;
+            }
+            else
+            {
+                _videoBitmapB = bitmap;
             }
         }
 
-        Console.WriteLine($"[VideoLayer] {message}");
+        _useVideoBitmapA = !useA;
+        return bitmap;
     }
+
+    private WriteableBitmap GetWarpedBitmap(int width, int height)
+    {
+        var useA = _useWarpedBitmapA;
+        var bitmap = useA ? _warpedBitmapA : _warpedBitmapB;
+        if (bitmap == null || bitmap.PixelSize.Width != width || bitmap.PixelSize.Height != height)
+        {
+            bitmap = new WriteableBitmap(
+                new PixelSize(width, height),
+                new Vector(96, 96),
+                PixelFormat.Bgra8888,
+                AlphaFormat.Premul);
+            if (useA)
+            {
+                _warpedBitmapA = bitmap;
+            }
+            else
+            {
+                _warpedBitmapB = bitmap;
+            }
+        }
+
+        _useWarpedBitmapA = !useA;
+        return bitmap;
+    }
+
+    private void DisposeBitmaps()
+    {
+        _videoBitmapA?.Dispose();
+        _videoBitmapB?.Dispose();
+        _warpedBitmapA?.Dispose();
+        _warpedBitmapB?.Dispose();
+        _videoBitmapA = null;
+        _videoBitmapB = null;
+        _warpedBitmapA = null;
+        _warpedBitmapB = null;
+    }
+
 }
