@@ -26,13 +26,12 @@ dotnet build VideoMap.sln
 dotnet run --project VideoMap.App
 ```
 
-### LibVLC on macOS
-If LibVLC is not found, run with explicit paths:
-```bash
-VLC_PLUGIN_PATH=/Applications/VLC.app/Contents/MacOS/plugins \
-VLC_LIB_PATH=/Applications/VLC.app/Contents/MacOS/lib \
-dotnet run --project VideoMap.App
-```
+### LibVLC configuration (macOS)
+The app can configure VLC without manual environment variables.
+1. Open the app.
+2. In the Properties panel, set "Percorso VLC (Contents/MacOS)" to `/Applications/VLC.app`.
+3. Click "Applica" and the app will restart automatically to load LibVLC.
+4. If VLC is installed elsewhere, point to that `.app` folder instead.
 
 ## Usage
 1. Click "Aggiungi poligono" to create a centered square.
