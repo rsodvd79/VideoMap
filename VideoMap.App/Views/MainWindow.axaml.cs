@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -524,6 +525,115 @@ public partial class MainWindow : Window
         {
             viewModel.SetStatus(status);
         }
+        if (viewModel != null)
+        {
+            viewModel.LibVlcStatus = status;
+        }
+    }
+
+    private async void OnBrowseVlcPathClick(object? sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as MainWindowViewModel;
+        if (viewModel == null)
+        {
+            return;
+        }
+
+        var storage = GetStorageProvider();
+        if (storage == null)
+        {
+            viewModel.SetStatus("Storage provider non disponibile");
+            return;
+        }
+
+        var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Seleziona cartella VLC (Contents/MacOS)",
+            AllowMultiple = false,
+        });
+
+        var folder = folders.FirstOrDefault();
+        var localPath = folder?.TryGetLocalPath();
+        if (string.IsNullOrWhiteSpace(localPath))
+        {
+            return;
+        }
+
+        viewModel.VlcBasePath = localPath;
+    }
+
+    private void OnApplyVlcPathClick(object? sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as MainWindowViewModel;
+        if (viewModel == null)
+        {
+            return;
+        }
+
+        ApplyVlcBasePath(viewModel, viewModel.VlcBasePath);
+    }
+
+    private void OnResetVlcPathClick(object? sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as MainWindowViewModel;
+        if (viewModel == null)
+        {
+            return;
+        }
+
+        viewModel.VlcBasePath = null;
+        ApplyVlcBasePath(viewModel, null);
+    }
+
+    private void ApplyVlcBasePath(MainWindowViewModel viewModel, string? path)
+    {
+        var normalized = NormalizeVlcBasePath(path);
+        viewModel.VlcBasePath = normalized;
+        AppSettingsService.SetVlcBasePath(normalized);
+        LibVlcEngine.ConfigureUserBasePath(normalized);
+        _libVlc = null;
+
+        if (LibVlcEngine.TryRelaunchWithEnvironment(normalized))
+        {
+            viewModel.SetStatus("Riavvio in corso per applicare la configurazione VLC...");
+            Close();
+            return;
+        }
+
+        var ok = LibVlcEngine.TryGet(out _libVlc, out var status);
+        viewModel.InitializeVideoEngine(_libVlc);
+        viewModel.LibVlcStatus = status;
+        viewModel.SetStatus(ok ? $"LibVLC configurato: {status}" : status);
+    }
+
+    private static string? NormalizeVlcBasePath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return null;
+        }
+
+        var trimmed = path.Trim();
+        if (Path.IsPathRooted(trimmed))
+        {
+            return trimmed;
+        }
+
+        var candidates = new[]
+        {
+            Path.Combine("/Applications", trimmed),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Applications", trimmed),
+        };
+
+        foreach (var candidate in candidates)
+        {
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return trimmed;
     }
 
 }

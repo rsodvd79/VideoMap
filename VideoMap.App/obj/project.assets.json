@@ -853,12 +853,6 @@
         "runtime": {
           "lib/net8.0/Tmds.DBus.Protocol.dll": {}
         }
-      },
-      "VideoLAN.LibVLC.Mac/3.1.2": {
-        "type": "package",
-        "build": {
-          "build/VideoLAN.LibVLC.Mac.targets": {}
-        }
       }
     }
   },
@@ -2686,19 +2680,6 @@
         "tmds.dbus.protocol.0.21.2.nupkg.sha512",
         "tmds.dbus.protocol.nuspec"
       ]
-    },
-    "VideoLAN.LibVLC.Mac/3.1.2": {
-      "sha512": "3VeHvZqR2LQQioE77iP8mRr9MZREqZt68QA+4c8oDs7XDNI0cnpgyoU02E9+yGS2bQzjZZQhIhW9ZWkrNiB+Zg==",
-      "type": "package",
-      "path": "videolan.libvlc.mac/3.1.2",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "build/VideoLAN.LibVLC.Mac.targets",
-        "build/osx-x64/libvlc.dylib",
-        "videolan.libvlc.mac.3.1.2.nupkg.sha512",
-        "videolan.libvlc.mac.nuspec"
-      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -2710,8 +2691,7 @@
       "Avalonia.Themes.Fluent >= 11.3.10",
       "CommunityToolkit.Mvvm >= 8.2.1",
       "LibVLCSharp >= 3.8.2",
-      "LibVLCSharp.Avalonia >= 3.8.2",
-      "VideoLAN.LibVLC.Mac >= 3.1.2"
+      "LibVLCSharp.Avalonia >= 3.8.2"
     ]
   },
   "packageFolders": {
@@ -2788,10 +2768,6 @@
           "LibVLCSharp.Avalonia": {
             "target": "Package",
             "version": "[3.8.2, )"
-          },
-          "VideoLAN.LibVLC.Mac": {
-            "target": "Package",
-            "version": "[3.1.2, )"
           }
         },
         "imports": [

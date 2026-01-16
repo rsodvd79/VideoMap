@@ -29,6 +29,8 @@
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/Avalonia.X11.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/CommunityToolkit.Mvvm.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/HarfBuzzSharp.dll
+/Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/LibVLCSharp.dll
+/Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/LibVLCSharp.Avalonia.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/MicroCom.Runtime.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/SkiaSharp.dll
 /Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/System.IO.Pipelines.dll
@@ -67,13 +69,10 @@
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.AssemblyInfoInputs.cache
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.AssemblyInfo.cs
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.csproj.CoreCompileInputs.cache
+/Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.sourcelink.json
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.798433B0.Up2Date
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.dll
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/refint/VideoMap.App.dll
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.pdb
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.genruntimeconfig.cache
 /Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/ref/VideoMap.App.dll
-/Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/LibVLCSharp.dll
-/Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/LibVLCSharp.Avalonia.dll
-/Users/daviderosa/VideoMap/VideoMap.App/obj/Debug/net8.0/VideoMap.App.sourcelink.json
-/Users/daviderosa/VideoMap/VideoMap.App/bin/Debug/net8.0/libvlc.dylib

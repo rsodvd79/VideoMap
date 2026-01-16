@@ -32,6 +32,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private int _sceneIndex;
     private DateTime _sceneStart;
     private double _sceneDuration;
+    private string? _vlcBasePath;
+    private string _libVlcStatus = "LibVLC non inizializzato";
 
     public MainWindowViewModel()
     {
@@ -106,6 +108,18 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool IsSelectedPolygonVideo => SelectedPolygon?.MediaType == AppMediaType.Video;
     public bool HasMediaLibrary => MediaLibrary.Count > 0;
     public bool HasNoSelectionAndNoOutput => HasNoSelection && HasNoOutputSelection;
+
+    public string? VlcBasePath
+    {
+        get => _vlcBasePath;
+        set => SetProperty(ref _vlcBasePath, value);
+    }
+
+    public string LibVlcStatus
+    {
+        get => _libVlcStatus;
+        set => SetProperty(ref _libVlcStatus, value);
+    }
 
     public SceneModel? SelectedScene
     {

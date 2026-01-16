@@ -326,6 +326,21 @@
                         <CheckBox Content="Loop" IsChecked="{Binding SelectedPolygon.IsVideoLoop}" />
                     </StackPanel>
                 </StackPanel>
+                <StackPanel Spacing="6">
+                    <TextBlock Text="LibVLC" Foreground="#BFBFBF" />
+                    <TextBlock Text="Percorso VLC (Contents/MacOS)" Foreground="#8F8F8F" FontSize="11" />
+                    <TextBox Text="{Binding VlcBasePath}"
+                             Watermark="/Applications/VLC.app/Contents/MacOS" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Sfoglia" Click="OnBrowseVlcPathClick" />
+                        <Button Content="Applica" Click="OnApplyVlcPathClick" />
+                        <Button Content="Reset" Click="OnResetVlcPathClick" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding LibVlcStatus}"
+                               TextWrapping="Wrap"
+                               Foreground="#8F8F8F"
+                               FontSize="11" />
+                </StackPanel>
                 <TextBlock IsVisible="{Binding HasNoSelectionAndNoOutput}"
                            Text="Seleziona un poligono o un output per modificarne i parametri."
                            TextWrapping="Wrap"

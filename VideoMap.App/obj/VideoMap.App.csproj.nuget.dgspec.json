@@ -75,10 +75,6 @@
             "LibVLCSharp.Avalonia": {
               "target": "Package",
               "version": "[3.8.2, )"
-            },
-            "VideoLAN.LibVLC.Mac": {
-              "target": "Package",
-              "version": "[3.1.2, )"
             }
           },
           "imports": [

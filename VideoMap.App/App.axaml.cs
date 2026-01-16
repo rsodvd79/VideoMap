@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using VideoMap.App.ViewModels;
 using VideoMap.App.Views;
+using VideoMap.App.Services;
 
 namespace VideoMap.App;
 
@@ -23,9 +24,16 @@ public partial class App : Application
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
+            var settings = AppSettingsService.Load();
+            LibVlcEngine.ConfigureUserBasePath(settings.VlcBasePath);
+            LibVlcEngine.TryGet(out var libVlc, out var status);
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel
+                {
+                    VlcBasePath = settings.VlcBasePath,
+                    LibVlcStatus = status,
+                },
             };
         }
 
