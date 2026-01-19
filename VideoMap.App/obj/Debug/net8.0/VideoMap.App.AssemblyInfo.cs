@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VideoMap.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aaa1f61e41ff90b8d39fd37bcf2b8aae2ae28807")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bc6775d6b01680ec447df27c202dddeb98fd4894")]
 [assembly: System.Reflection.AssemblyProductAttribute("VideoMap.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VideoMap.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
