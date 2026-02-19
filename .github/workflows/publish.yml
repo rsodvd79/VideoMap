@@ -1,0 +1,57 @@
+name: build-and-publish-videomap
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifactName: VideoMap-win-x64
+
+          - os: macos-latest
+            rid: osx-x64
+            artifactName: VideoMap-macos-x64
+
+          - os: macos-latest
+            rid: osx-arm64
+            artifactName: VideoMap-macos-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore "VideoMap.App/VideoMap.App.csproj"
+
+      - name: Publish
+        run: >
+          dotnet publish "VideoMap.App/VideoMap.App.csproj"
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained true
+          /p:PublishSingleFile=true
+          /p:DebugType=None
+          /p:DebugSymbols=false
+          -o "artifacts/VideoMap/${{ matrix.rid }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifactName }}
+          path: artifacts/VideoMap/${{ matrix.rid }}
