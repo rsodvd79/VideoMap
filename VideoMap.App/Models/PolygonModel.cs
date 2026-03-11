@@ -14,7 +14,7 @@ using SkiaSharp;
 
 namespace VideoMap.App.Models;
 
-public partial class PolygonModel : ObservableObject
+public partial class PolygonModel : ObservableObject, IDisposable
 {
     private string _name = "Poligono";
     private string? _mediaPath;
@@ -483,6 +483,24 @@ public partial class PolygonModel : ObservableObject
         }
 
         WarpedBitmap = bitmap;
+    }
+
+    public void Dispose()
+    {
+        _points.CollectionChanged -= OnPointsChanged;
+        DetachPointHandlers(_points);
+
+        _skImage?.Dispose();
+        _skImage = null;
+        _skImagePath = null;
+
+        var oldImage = _imageBitmap;
+        _imageBitmap = null;
+        oldImage?.Dispose();
+
+        var oldWarped = _warpedBitmap;
+        _warpedBitmap = null;
+        oldWarped?.Dispose();
     }
 
     private SKImage? GetSkImage()

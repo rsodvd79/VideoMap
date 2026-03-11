@@ -30,7 +30,6 @@
                     <Button Content="Aggiungi poligono"
                             Command="{Binding StartPolygonCommand}"
                             CommandParameter="{Binding Bounds, ElementName=DesignSurface}" />
-                    <Button Content="Completa poligono" Command="{Binding CompletePolygonCommand}" IsEnabled="{Binding IsDrawingPolygon}" />
                     <Button Content="Apri preview" Click="OnOpenPreviewClick" />
                     <TextBlock Text="{Binding StatusMessage}"
                                Margin="16,0,0,0"

@@ -63,6 +63,9 @@ public static class ProjectSerializer
                 Name = polygon.Name,
                 MediaPath = mediaPath,
                 MediaType = polygon.MediaType,
+                IsVideoSolo = polygon.IsVideoSolo,
+                IsVideoMuted = polygon.IsVideoMuted,
+                IsVideoLoop = polygon.IsVideoLoop,
             };
 
             foreach (var point in polygon.Points)

@@ -304,38 +304,16 @@ public partial class MainWindow : Window
             return;
         }
 
-        var properties = e.GetCurrentPoint(surface).Properties;
-
-        if (!viewModel.IsDrawingPolygon)
+        if (e.GetCurrentPoint(surface).Properties.IsLeftButtonPressed)
         {
-            if (properties.IsLeftButtonPressed)
-            {
-                viewModel.SelectedPolygon = null;
-            }
-
-            return;
-        }
-
-        var point = e.GetPosition(surface);
-
-        if (properties.IsRightButtonPressed)
-        {
-            viewModel.CompletePolygonCommand.Execute(null);
-            e.Handled = true;
-            return;
-        }
-
-        if (properties.IsLeftButtonPressed)
-        {
-            viewModel.AddPointAt(point.X, point.Y);
-            e.Handled = true;
+            viewModel.SelectedPolygon = null;
         }
     }
 
     private void OnPolygonPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         var viewModel = DataContext as MainWindowViewModel;
-        if (viewModel == null || viewModel.IsDrawingPolygon)
+        if (viewModel == null)
         {
             return;
         }
@@ -359,7 +337,7 @@ public partial class MainWindow : Window
     private void OnVertexPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         var viewModel = DataContext as MainWindowViewModel;
-        if (viewModel == null || viewModel.IsDrawingPolygon)
+        if (viewModel == null)
         {
             return;
         }

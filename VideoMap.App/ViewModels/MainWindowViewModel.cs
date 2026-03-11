@@ -19,7 +19,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private SceneModel? _selectedScene;
     private OutputSurfaceModel? _selectedOutput;
     private string _statusMessage = "Progetto non salvato";
-    private bool _isDrawingPolygon;
     private string? _projectPath;
     private int _polygonSequence = 1;
     private LibVLC? _libVlc;
@@ -38,9 +37,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         NewProjectCommand = new RelayCommand(CreateNewProject);
-        StartPolygonCommand = new RelayCommand<Rect>(StartPolygon, _ => !IsDrawingPolygon);
-        CompletePolygonCommand = new RelayCommand(CompletePolygon, () => IsDrawingPolygon);
-        RemovePolygonCommand = new RelayCommand(RemoveSelectedPolygon, () => HasSelection && !IsDrawingPolygon);
+        StartPolygonCommand = new RelayCommand<Rect>(StartPolygon);
+        RemovePolygonCommand = new RelayCommand(RemoveSelectedPolygon, () => HasSelection);
         MovePolygonUpCommand = new RelayCommand(MovePolygonUp, () => CanMovePolygon(-1));
         MovePolygonDownCommand = new RelayCommand(MovePolygonDown, () => CanMovePolygon(1));
         PlayAllCommand = new RelayCommand(PlayAll);
@@ -194,20 +192,6 @@ public partial class MainWindowViewModel : ViewModelBase
         private set => SetProperty(ref _sceneStatus, value);
     }
 
-    public bool IsDrawingPolygon
-    {
-        get => _isDrawingPolygon;
-        private set
-        {
-            if (SetProperty(ref _isDrawingPolygon, value))
-            {
-                StartPolygonCommand.NotifyCanExecuteChanged();
-                CompletePolygonCommand.NotifyCanExecuteChanged();
-                RemovePolygonCommand.NotifyCanExecuteChanged();
-            }
-        }
-    }
-
     public string StatusMessage
     {
         get => _statusMessage;
@@ -222,7 +206,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public IRelayCommand NewProjectCommand { get; }
     public IRelayCommand StartPolygonCommand { get; }
-    public IRelayCommand CompletePolygonCommand { get; }
     public IRelayCommand RemovePolygonCommand { get; }
     public IRelayCommand MovePolygonUpCommand { get; }
     public IRelayCommand MovePolygonDownCommand { get; }
@@ -237,17 +220,6 @@ public partial class MainWindowViewModel : ViewModelBase
     public IRelayCommand AddOutputCommand { get; }
     public IRelayCommand RemoveOutputCommand { get; }
 
-    public void AddPointAt(double x, double y)
-    {
-        if (!IsDrawingPolygon || SelectedPolygon == null)
-        {
-            return;
-        }
-
-        SelectedPolygon.Points.Add(new PointModel(x, y));
-        StatusMessage = $"Vertice aggiunto ({SelectedPolygon.Points.Count})";
-    }
-
     public void SetProject(ProjectModel project, string? path)
     {
         DetachProject(Project);
@@ -257,7 +229,6 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedPolygon = null;
         SelectedScene = Project.Scenes.FirstOrDefault();
         SelectedOutput = Project.Outputs.FirstOrDefault();
-        IsDrawingPolygon = false;
         _polygonSequence = Project.Polygons.Count + 1;
         StopSceneTimeline();
         StatusMessage = path == null
@@ -285,7 +256,6 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedPolygon = null;
         SelectedScene = Project.Scenes.FirstOrDefault();
         SelectedOutput = Project.Outputs.FirstOrDefault();
-        IsDrawingPolygon = false;
         _polygonSequence = 1;
         StopSceneTimeline();
         StatusMessage = "Nuovo progetto";
@@ -325,30 +295,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Project.Polygons.Add(polygon);
         UpdatePolygonOrder();
         SelectedPolygon = polygon;
-        IsDrawingPolygon = false;
         StatusMessage = "Poligono creato al centro (quadrato)";
-    }
-
-    private void CompletePolygon()
-    {
-        if (SelectedPolygon == null)
-        {
-            IsDrawingPolygon = false;
-            return;
-        }
-
-        if (SelectedPolygon.Points.Count < 3)
-        {
-            Project.Polygons.Remove(SelectedPolygon);
-            SelectedPolygon = null;
-            StatusMessage = "Poligono annullato (servono almeno 3 vertici)";
-        }
-        else
-        {
-            StatusMessage = "Poligono completato";
-        }
-
-        IsDrawingPolygon = false;
     }
 
     private void RemoveSelectedPolygon()
@@ -402,6 +349,7 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (var polygon in project.Polygons)
         {
             DetachPolygon(polygon);
+            polygon.Dispose();
         }
 
         foreach (var assignment in SceneAssignments)
@@ -427,6 +375,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 DetachPolygon(polygon);
                 RemovePolygonFromScenes(polygon.Id);
                 RemovePolygonFromOutputs(polygon.Id);
+                polygon.Dispose();
             }
         }
 
