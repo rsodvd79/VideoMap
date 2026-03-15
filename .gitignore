@@ -9,3 +9,4 @@ VideoMap.App/packages/
 *.log
 *.tmp
 *.bak
+.DS_Store
