@@ -1,43 +1,43 @@
 # VideoMap
 
-VideoMap is a cross-platform video mapping tool built with .NET 8 and Avalonia.
-It provides a design window to create polygonal mapping surfaces and a preview
-window to see the final output. Polygons can be associated with images or videos,
-saved, and reloaded.
+VideoMap è uno strumento di video mapping multipiattaforma realizzato con .NET 8 e Avalonia.
+Offre una finestra di progettazione per creare superfici di mappatura poligonali e una finestra
+di anteprima per visualizzare il risultato finale. I poligoni possono essere associati a immagini
+o video, salvati e ricaricati.
 
-## Features
-- Design surface with polygon creation and vertex dragging
-- Image and video assignment per polygon
-- Video preview using LibVLC (software callback rendering)
-- Polygon clipping and 4-point warp (perspective) for images and videos
-- Project save/load with relative asset paths
+## Funzionalità
+- Superficie di progettazione con creazione di poligoni e trascinamento dei vertici
+- Assegnazione di immagini e video per poligono
+- Anteprima video tramite LibVLC (rendering software con callback)
+- Ritaglio poligonale e warp a 4 punti (prospettiva) per immagini e video
+- Salvataggio/caricamento del progetto con percorsi relativi delle risorse
 
-## Requirements
+## Requisiti
 - .NET SDK 8.0
-- VLC installed (LibVLC runtime)
+- VLC installato (runtime LibVLC)
 
-## Build
+## Compilazione
 ```bash
 dotnet build VideoMap.sln
 ```
 
-## Run
+## Avvio
 ```bash
 dotnet run --project VideoMap.App
 ```
 
-### LibVLC configuration (macOS)
-The app can configure VLC without manual environment variables.
-1. Open the app.
-2. In the Properties panel, set "Percorso VLC (Contents/MacOS)" to `/Applications/VLC.app`.
-3. Click "Applica" and the app will restart automatically to load LibVLC.
-4. If VLC is installed elsewhere, point to that `.app` folder instead.
+### Configurazione LibVLC (macOS)
+L'applicazione può configurare VLC senza dover impostare manualmente le variabili d'ambiente.
+1. Aprire l'applicazione.
+2. Nel pannello Proprietà, impostare "Percorso VLC (Contents/MacOS)" su `/Applications/VLC.app`.
+3. Fare clic su "Applica": l'app si riavvierà automaticamente per caricare LibVLC.
+4. Se VLC è installato in un'altra posizione, indicare quella cartella `.app`.
 
-## Usage
-1. Click "Aggiungi poligono" to create a centered square.
-2. Drag vertices to shape the polygon.
-3. Select a polygon and import media (image or video).
-4. Open Preview to see the warped/clipped output.
+## Utilizzo
+1. Fare clic su "Aggiungi poligono" per creare un quadrato centrato.
+2. Trascinare i vertici per modellare il poligono.
+3. Selezionare un poligono e importare un file multimediale (immagine o video).
+4. Aprire l'Anteprima per visualizzare l'output deformato/ritagliato.
 
-## License
+## Licenza
 TBD
