@@ -18,7 +18,7 @@ jobs:
   publish:
     runs-on: ${{ matrix.os }}
     env:
-      VERSION: >-
+      APP_VERSION: >-
         ${{
           startsWith(github.ref, 'refs/tags/') && github.ref_name ||
           github.event_name == 'workflow_dispatch' && github.event.inputs.tag ||
@@ -114,8 +114,8 @@ jobs:
             <key>CFBundleName</key><string>${APP_NAME}</string>
             <key>CFBundleDisplayName</key><string>${APP_NAME}</string>
             <key>CFBundleIdentifier</key><string>com.biemme.${APP_NAME}</string>
-            <key>CFBundleVersion</key><string>${VERSION}</string>
-            <key>CFBundleShortVersionString</key><string>${VERSION}</string>
+            <key>CFBundleVersion</key><string>${APP_VERSION}</string>
+            <key>CFBundleShortVersionString</key><string>${APP_VERSION}</string>
             <key>CFBundleExecutable</key><string>${APP_EXE}</string>
             <key>NSHighResolutionCapable</key><true/>
           </dict>
