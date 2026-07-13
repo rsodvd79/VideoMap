@@ -17,18 +17,18 @@ public partial class PreviewWindow : Window
     {
     }
 
-    public PreviewWindow(ProjectModel project)
+    public PreviewWindow(ProjectModel project, OutputSurfaceModel? initialOutput = null)
     {
         InitializeComponent();
         InitializeVideoEngine();
-        DataContext = new PreviewWindowViewModel(project, _libVlc, _libVlcStatus);
+        DataContext = new PreviewWindowViewModel(project, _libVlc, _libVlcStatus, initialOutput);
         Closed += (_, _) => Cleanup();
     }
 
-    public void ResetProject(ProjectModel project)
+    public void ResetProject(ProjectModel project, OutputSurfaceModel? initialOutput = null)
     {
         (DataContext as IDisposable)?.Dispose();
-        DataContext = new PreviewWindowViewModel(project, _libVlc, _libVlcStatus);
+        DataContext = new PreviewWindowViewModel(project, _libVlc, _libVlcStatus, initialOutput);
     }
 
     private void InitializeVideoEngine()

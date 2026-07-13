@@ -104,7 +104,7 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         private set => SetProperty(ref _hasVideo, value);
     }
 
-    public bool IsVisible => HasVideo && !_isSuppressed && _polygon.IsSceneVisible;
+    public bool IsVisible => HasVideo && !_isSuppressed && _polygon.IsSceneVisible && _polygon.IsOutputVisible;
 
     public bool IsFrameVisible => IsVisible && HasVideoBitmap;
 
@@ -226,6 +226,24 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
             return;
         }
 
+        if (e.PropertyName == nameof(PolygonModel.IsOutputVisible))
+        {
+            OnPropertyChanged(nameof(IsVisible));
+            OnPropertyChanged(nameof(IsFrameVisible));
+            OnPropertyChanged(nameof(IsWarpedVisible));
+            OnPropertyChanged(nameof(IsClipVisible));
+            UpdateWarpedVideoFrame();
+            if (!_polygon.IsOutputVisible)
+            {
+                StopPlayback();
+            }
+            else
+            {
+                UpdateFromPolygon();
+            }
+            return;
+        }
+
         if (e.PropertyName == nameof(PolygonModel.IsVideoMuted))
         {
             UpdateMute();
@@ -251,7 +269,7 @@ public partial class VideoLayerViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(IsWarpedVisible));
         OnPropertyChanged(nameof(IsClipVisible));
 
-        if (!hasVideo || _isSuppressed || !_polygon.IsSceneVisible)
+        if (!hasVideo || _isSuppressed || !_polygon.IsSceneVisible || !_polygon.IsOutputVisible)
         {
             StopPlayback();
             return;

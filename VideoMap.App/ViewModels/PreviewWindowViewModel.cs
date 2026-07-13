@@ -14,6 +14,7 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
     private readonly ProjectModel _project;
     private readonly LibVLC? _libVlc;
     private readonly string? _libVlcStatus;
+    private OutputSurfaceModel? _selectedOutput;
     private string _videoStatus = "Nessun video assegnato";
 
     public PreviewWindowViewModel()
@@ -21,21 +22,59 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
     {
     }
 
-    public PreviewWindowViewModel(ProjectModel project, LibVLC? libVlc, string? libVlcStatus)
+    public PreviewWindowViewModel(ProjectModel project, LibVLC? libVlc, string? libVlcStatus, OutputSurfaceModel? initialOutput = null)
     {
         _project = project;
         _libVlc = libVlc;
         _libVlcStatus = libVlcStatus;
         _project.Polygons.CollectionChanged += OnPolygonsChanged;
+        _project.Outputs.CollectionChanged += OnOutputsChanged;
 
         foreach (var polygon in _project.Polygons)
         {
             AttachPolygon(polygon);
         }
 
+        SelectedOutput = initialOutput ?? _project.Outputs.FirstOrDefault();
         UpdateVideoStatus();
         UpdateVideoSoloState();
     }
+
+    public ObservableCollection<OutputSurfaceModel> Outputs => _project.Outputs;
+
+    public OutputSurfaceModel? SelectedOutput
+    {
+        get => _selectedOutput;
+        set
+        {
+            if (ReferenceEquals(_selectedOutput, value))
+            {
+                return;
+            }
+
+            var previous = _selectedOutput;
+            if (SetProperty(ref _selectedOutput, value))
+            {
+                if (previous != null)
+                {
+                    previous.PolygonIds.CollectionChanged -= OnOutputPolygonIdsChanged;
+                }
+
+                if (_selectedOutput != null)
+                {
+                    _selectedOutput.PolygonIds.CollectionChanged += OnOutputPolygonIdsChanged;
+                }
+
+                OnPropertyChanged(nameof(SurfaceWidth));
+                OnPropertyChanged(nameof(SurfaceHeight));
+                ReapplyOutputVisibility();
+            }
+        }
+    }
+
+    public double SurfaceWidth => _selectedOutput != null && _selectedOutput.Width > 0 ? _selectedOutput.Width : _project.CanvasWidth;
+
+    public double SurfaceHeight => _selectedOutput != null && _selectedOutput.Height > 0 ? _selectedOutput.Height : _project.CanvasHeight;
 
     public ProjectModel Project => _project;
 
@@ -79,6 +118,7 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
         {
             SyncVideoLayerOrder();
         }
+        ReapplyOutputVisibility();
         UpdateVideoStatus();
         UpdateVideoSoloState();
     }
@@ -86,6 +126,12 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
     public void Dispose()
     {
         _project.Polygons.CollectionChanged -= OnPolygonsChanged;
+        _project.Outputs.CollectionChanged -= OnOutputsChanged;
+
+        if (_selectedOutput != null)
+        {
+            _selectedOutput.PolygonIds.CollectionChanged -= OnOutputPolygonIdsChanged;
+        }
 
         foreach (var polygon in _project.Polygons)
         {
@@ -95,6 +141,31 @@ public partial class PreviewWindowViewModel : ViewModelBase, IDisposable
         foreach (var layer in VideoLayers.ToList())
         {
             DetachVideoLayer(layer);
+        }
+    }
+
+    private void OnOutputsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (_selectedOutput != null && !_project.Outputs.Contains(_selectedOutput))
+        {
+            SelectedOutput = _project.Outputs.FirstOrDefault();
+        }
+    }
+
+    private void OnOutputPolygonIdsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        ReapplyOutputVisibility();
+    }
+
+    private void ReapplyOutputVisibility()
+    {
+        var ids = _selectedOutput == null
+            ? null
+            : new System.Collections.Generic.HashSet<Guid>(_selectedOutput.PolygonIds);
+
+        foreach (var polygon in _project.Polygons)
+        {
+            polygon.IsOutputVisible = ids == null || ids.Contains(polygon.Id);
         }
     }
 

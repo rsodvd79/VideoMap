@@ -33,6 +33,7 @@ public partial class PolygonModel : ObservableObject, IDisposable
     private bool _isVideoMuted;
     private bool _isVideoLoop;
     private bool _isSceneVisible = true;
+    private bool _isOutputVisible = true;
 
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -139,6 +140,20 @@ public partial class PolygonModel : ObservableObject, IDisposable
         }
     }
 
+    [JsonIgnore]
+    public bool IsOutputVisible
+    {
+        get => _isOutputVisible;
+        set
+        {
+            if (SetProperty(ref _isOutputVisible, value))
+            {
+                OnPropertyChanged(nameof(HasImageClip));
+                OnPropertyChanged(nameof(IsWarpedVisible));
+            }
+        }
+    }
+
     public PolygonModel()
     {
         _points.CollectionChanged += OnPointsChanged;
@@ -199,7 +214,7 @@ public partial class PolygonModel : ObservableObject, IDisposable
     public bool HasWarpedImage => WarpedBitmap != null;
 
     [JsonIgnore]
-    public bool IsWarpedVisible => HasWarpedImage && IsSceneVisible;
+    public bool IsWarpedVisible => HasWarpedImage && IsSceneVisible && IsOutputVisible;
 
     [JsonIgnore]
     public Rect Bounds
@@ -215,7 +230,7 @@ public partial class PolygonModel : ObservableObject, IDisposable
     public bool HasClip => ClipGeometry != null;
 
     [JsonIgnore]
-    public bool HasImageClip => HasImage && HasClip && IsSceneVisible && !HasWarpedImage;
+    public bool HasImageClip => HasImage && HasClip && IsSceneVisible && IsOutputVisible && !HasWarpedImage;
 
     public void Normalize()
     {

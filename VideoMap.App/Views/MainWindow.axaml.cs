@@ -59,12 +59,12 @@ public partial class MainWindow : Window
 
         if (_previewWindow == null)
         {
-            _previewWindow = new PreviewWindow(viewModel.Project);
+            _previewWindow = new PreviewWindow(viewModel.Project, viewModel.SelectedOutput);
             _previewWindow.Closed += (_, _) => _previewWindow = null;
         }
         else
         {
-            _previewWindow.ResetProject(viewModel.Project);
+            _previewWindow.ResetProject(viewModel.Project, viewModel.SelectedOutput);
         }
 
         _previewWindow.Show();
