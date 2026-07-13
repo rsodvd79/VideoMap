@@ -930,14 +930,6 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 scene.ActivePolygonIds.Remove(id);
             }
-
-            foreach (var id in ids)
-            {
-                if (!scene.ActivePolygonIds.Contains(id))
-                {
-                    scene.ActivePolygonIds.Add(id);
-                }
-            }
         }
     }
 
@@ -951,14 +943,6 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var id in toRemove)
             {
                 output.PolygonIds.Remove(id);
-            }
-
-            foreach (var id in ids)
-            {
-                if (!output.PolygonIds.Contains(id))
-                {
-                    output.PolygonIds.Add(id);
-                }
             }
         }
     }

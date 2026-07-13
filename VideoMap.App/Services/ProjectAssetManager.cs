@@ -155,7 +155,8 @@ public static class ProjectAssetManager
     {
         var fullPath = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar);
         var fullDir = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar);
-        return fullPath.StartsWith(fullDir, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(fullPath, fullDir, StringComparison.OrdinalIgnoreCase)
+            || fullPath.StartsWith(fullDir + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
     }
 }
 
