@@ -18,6 +18,7 @@ A cross-platform (Windows/macOS) video mapping tool: a polygon design surface pl
 - `Program.Main` must not touch Avalonia/third-party APIs or `SynchronizationContext` before `AppMain` runs (see the comment in `Program.cs`).
 - `AvaloniaUseCompiledBindingsByDefault` is on → bindings need `x:DataType` and compile-time types, not reflection-based `{Binding}`.
 - `AllowUnsafeBlocks` is enabled for LibVLC software-callback rendering; unsafe pixel code is expected, not a mistake.
+- **macOS dock icon outside bundle:** `MacDockIcon.Apply()` in `App.axaml.cs` uses the ObjC runtime (`NSApplication.setApplicationIconImage:`) to set the dock icon programmatically. This is needed because the dock icon only comes from a `.app` bundle otherwise. Icon source is `Assets/AppIcon.png` (1024×1024 PNG, loaded via `avares://`).
 
 ## Packaging / release
 - Local macOS bundle: `./build-macos.sh` (publishes `osx-arm64` self-contained, copies `VideoMap.App/Info.plist` + `Assets/AppIcon.icns`, opens the `.app`).

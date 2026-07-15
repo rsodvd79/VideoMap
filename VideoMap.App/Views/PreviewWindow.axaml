@@ -7,6 +7,7 @@
         x:Class="VideoMap.App.Views.PreviewWindow"
         x:DataType="vm:PreviewWindowViewModel"
         Title="VideoMap Preview"
+        Icon="avares://VideoMap.App/Assets/AppIcon.ico"
         Background="#000000">
 
     <Design.DataContext>
