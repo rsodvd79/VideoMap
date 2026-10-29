@@ -15,7 +15,7 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleExecutable</key>
-    <string>VideoMap.App</string>
+    <string>videomap</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>NSHighResolutionCapable</key>

@@ -1,0 +1,12 @@
+VideoMap - Rust + eframe
+
+VLC 3 deve essere installato separatamente, con la stessa architettura
+dell'applicazione: x64 su Windows, Apple Silicon su macOS.
+VLC non e incluso in questo pacchetto. Non e necessario installare .NET.
+
+Se VLC non viene rilevato, configurare il percorso nel pannello Proprieta.
+Su macOS e possibile indicare /Applications/VLC.app.
+
+I progetti e i preset della precedente versione .NET non sono compatibili.
+Per spostare un progetto salvato, copiare anche la sua cartella Assets.
+Le uscite si aprono dall'editor; Esc disattiva il fullscreen.

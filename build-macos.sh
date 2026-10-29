@@ -1,44 +1,33 @@
 #!/usr/bin/env bash
-# build-macos.sh — pubblica VideoMap e crea il bundle .app
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT="$SCRIPT_DIR/VideoMap.App/VideoMap.App.csproj"
-APP_NAME="VideoMap"
-DIST_DIR="$SCRIPT_DIR/dist"
-APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
-PUBLISH_DIR="$SCRIPT_DIR/.publish-macos"
-RID="osx-arm64"
-
-echo "▶ Pulizia..."
-rm -rf "$APP_BUNDLE" "$PUBLISH_DIR"
-mkdir -p "$DIST_DIR"
-
-echo "▶ Pubblicazione ($RID)..."
-dotnet publish "$PROJECT" \
-    -r "$RID" \
-    --self-contained true \
-    -c Release \
-    -o "$PUBLISH_DIR" \
-    /p:PublishSingleFile=false \
-    --nologo -v quiet
-
-echo "▶ Creazione bundle $APP_NAME.app..."
-mkdir -p "$APP_BUNDLE/Contents/MacOS"
-mkdir -p "$APP_BUNDLE/Contents/Resources"
-
-# Copia tutti i file pubblicati nella cartella MacOS
-cp -r "$PUBLISH_DIR/"* "$APP_BUNDLE/Contents/MacOS/"
-
-# Info.plist
-cp "$SCRIPT_DIR/VideoMap.App/Info.plist" "$APP_BUNDLE/Contents/"
-
-# Icona personalizzata
-ICNS_SRC="$SCRIPT_DIR/VideoMap.App/Assets/AppIcon.icns"
-if [ -f "$ICNS_SRC" ]; then
-    cp "$ICNS_SRC" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+if [[ "$(uname -s)" != Darwin || "$(uname -m)" != arm64 ]]; then
+    echo "Questo script richiede macOS Apple Silicon." >&2
+    exit 1
 fi
 
-echo "✅ Bundle creato: $APP_BUNDLE"
-echo "▶ Apertura..."
-open "$APP_BUNDLE"
+cargo build --release --locked
+APP="$ROOT/dist/VideoMap.app"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+install -m 755 target/release/videomap "$APP/Contents/MacOS/videomap"
+cp packaging/Info.plist "$APP/Contents/Info.plist"
+cp assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+cp packaging/LEGGIMI.txt "$APP/Contents/Resources/LEGGIMI.txt"
+
+if [[ -n "${VIDEOMAP_VERSION:-}" ]]; then
+    [[ "$VIDEOMAP_VERSION" =~ ^v[0-9]+(\.[0-9]+)*$ ]] || {
+        echo "Versione non valida" >&2
+        exit 1
+    }
+    VERSION="${VIDEOMAP_VERSION#v}"
+    BUNDLE_VERSION="$(printf '%s' "$VERSION" | awk -F. '{printf "%d.%d.%d", $1, $2, $3}')"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $BUNDLE_VERSION" "$APP/Contents/Info.plist"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP/Contents/Info.plist"
+fi
+
+echo "Bundle creato: $APP"
+if [[ "${1:-}" != "--no-open" ]]; then
+    open "$APP"
+fi

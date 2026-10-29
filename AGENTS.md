@@ -1,26 +1,62 @@
-# AGENTS.md
+# VideoMap
 
-## What this is
-A cross-platform (Windows/macOS) video mapping tool: a polygon design surface plus a preview window that warps/clips images and videos onto polygons. Built with **.NET 8 + Avalonia 11.3.10** using MVVM (`CommunityToolkit.Mvvm`).
+Applicazione desktop di video mapping in Rust + eframe/egui con backend wgpu.
+Piattaforme di rilascio: Windows x64 e macOS Apple Silicon. UI e documentazione
+utente in italiano.
 
-## Layout
-- Single project `VideoMap.App` (the `VideoMap.sln` references only it). `Program.cs` is the entrypoint; `App.axaml` + `ViewLocator.cs` wire Views↔ViewModels by convention.
-- Code is split into `Models/`, `ViewModels/`, `Views/`, `Services/`. Add a matching `FooView.axaml`/`.cs` + `FooViewModel.cs` and the locator resolves it — no manual registration.
-- UI strings and docs are in **Italian**; keep new user-facing strings consistent with that.
+## Struttura
 
-## Build / run
-- Build: `dotnet build VideoMap.sln`
-- Run (dev): `dotnet run --project VideoMap.App`
-- There are **no automated tests** in this repo — verification is manual via the running app.
+Un singolo package Cargo. `src/main.rs` avvia eframe; `app.rs` gestisce stato,
+playback e timeline; `ui.rs` contiene pannelli e interazioni.
+`model.rs` contiene solo dati serializzabili; `project_io.rs` gestisce file,
+Assets e preset. `geometry.rs` calcola omografia e trasformazioni.
+`render.rs` e `shaders/mapping.wgsl` condividono il rendering fra tutte le viste.
+`outputs.rs` gestisce viewport/monitor; `video.rs` isola le API native LibVLC.
 
-## Hard-won quirks
-- **VLC runtime is required** (LibVLC). On macOS, do NOT set `DYLD_LIBRARY_PATH` manually: the app relaunches itself via `LibVlcEngine.TryRelaunchWithEnvironment` after you set "Percorso VLC (Contents/MacOS)" to `/Applications/VLC.app` in the Properties panel and click "Applica". Don't try to force-load LibVLC outside that path.
-- `Program.Main` must not touch Avalonia/third-party APIs or `SynchronizationContext` before `AppMain` runs (see the comment in `Program.cs`).
-- `AvaloniaUseCompiledBindingsByDefault` is on → bindings need `x:DataType` and compile-time types, not reflection-based `{Binding}`.
-- `AllowUnsafeBlocks` is enabled for LibVLC software-callback rendering; unsafe pixel code is expected, not a mistake.
-- **macOS dock icon outside bundle:** `MacDockIcon.Apply()` in `App.axaml.cs` uses the ObjC runtime (`NSApplication.setApplicationIconImage:`) to set the dock icon programmatically. This is needed because the dock icon only comes from a `.app` bundle otherwise. Icon source is `Assets/AppIcon.png` (1024×1024 PNG, loaded via `avares://`).
+## Comandi
 
-## Packaging / release
-- Local macOS bundle: `./build-macos.sh` (publishes `osx-arm64` self-contained, copies `VideoMap.App/Info.plist` + `Assets/AppIcon.icns`, opens the `.app`).
-- CI (`publish.yml`) publishes `win-x64` and `osx-arm64` self-contained via `dotnet publish`, then makes a GitHub Release.
-- Release trigger: push a tag or run `workflow_dispatch` with a **tag matching `^v[0-9]+(\.[0-9]+)*$`** (e.g. `v1.2.3`). A malformed tag fails the workflow. Publishing order matters: `publish` job must finish before the `release` job (it `needs: publish`).
+```bash
+cargo run --locked
+cargo fmt --all -- --check
+cargo clippy --all-targets --all-features --locked -- -D warnings
+cargo test --locked
+cargo test --locked gpu_uses_perspective_not_affine_uvs -- --ignored
+cargo build --release --locked
+./build-macos.sh --no-open
+```
+
+Usare la toolchain fissata in `rust-toolchain.toml` e committare `Cargo.lock`.
+Le versioni eframe/egui-wgpu/wgpu devono essere compatibili: usare i re-export
+di eframe invece di aggiungere una diversa versione diretta di wgpu.
+
+## Invarianti
+
+- Un player per poligono video, mai per finestra. Le assegnazioni output non
+  modificano la visibilità globale del modello o il trasporto.
+- La timeline avanza una volta nel ciclo applicativo usando `Instant`, non
+  nelle callback delle uscite.
+- Prospettiva vera: UV omogenee e divisione per pixel nello shader. Due triangoli
+  con UV affini non sono equivalenti.
+- Le modifiche geometriche non valide conservano l'ultima geometria valida.
+- Frame completi e buffer limitati; nessun accesso UI/GPU dalle callback C.
+  Libreria, player e memoria callback devono rispettare l'ordine di teardown.
+- Operazioni file e decodifica immagini fuori dal thread UI.
+- Nessun import legacy .NET. Nuovi documenti con formato e `schema_version`.
+- Validare un caricamento prima di sostituire il progetto corrente; salvare
+  tramite file temporaneo e sostituzione del documento.
+
+## VLC e pacchetti
+
+VLC 3 è esterno e caricato dinamicamente. Supportare editor e immagini anche
+senza runtime. Architettura VLC e app devono coincidere.
+Su macOS il bootstrap rilancia il processo con il proprio ambiente: non
+configurare manualmente `DYLD_LIBRARY_PATH` nella shell.
+
+Icone in `assets/`; metadati in `packaging/`.
+`build-macos.sh` crea `dist/VideoMap.app`; CI crea ZIP Windows/macOS.
+Tag release numerici con prefisso `v`; il job release dipende dalle build.
+Non includere runtime .NET, VLC o directory di build nel repository.
+
+Le prove automatiche senza GPU/VLC non certificano la riproduzione o il
+fullscreen. Verificare anche più monitor, DPI misti, hotplug e chiusura con
+video attivi su entrambe le piattaforme.

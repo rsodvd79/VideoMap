@@ -1,7 +1,9 @@
 .DS_Store
+/target/
+/dist/
+/.publish-macos/
 **/bin/
 **/obj/
-VideoMap.App/packages/
 .vs/
 .idea/
 *.user
@@ -9,4 +11,3 @@ VideoMap.App/packages/
 *.log
 *.tmp
 *.bak
-.DS_Store
